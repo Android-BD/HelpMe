@@ -1,0 +1,105 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingBottom="@dimen/activity_vertical_margin"
+    android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:paddingTop="@dimen/activity_vertical_margin"
+    tools:context=".GetRawData" >
+
+
+
+    <TextView
+        android:id="@+id/tvAccelerometer1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="60dp"
+        android:text="sample"
+        android:textAppearance="?android:attr/textAppearanceLarge" />
+
+    <TextView
+        android:id="@+id/tvAccelerometer2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/tvAccelerometer1"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="15dp"
+        android:text="Large Text"
+        android:textAppearance="?android:attr/textAppearanceLarge" />
+
+    <TextView
+        android:id="@+id/tvAccelerometer3"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/tvAccelerometer2"
+        android:layout_below="@+id/tvAccelerometer2"
+        android:layout_marginTop="24dp"
+        android:text="Large Text"
+        android:textAppearance="?android:attr/textAppearanceLarge" />
+
+    <TextView
+        android:id="@+id/tvLabelDlugosc"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBaseline="@+id/tvAccelerometer1"
+        android:layout_alignBottom="@+id/tvAccelerometer1"
+        android:layout_marginRight="16dp"
+        android:text="@string/dlugosc" />
+
+    <TextView
+        android:id="@+id/tvLabelSzerokosc"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBaseline="@+id/tvAccelerometer2"
+        android:layout_alignBottom="@+id/tvAccelerometer2"
+        android:text="@string/szerokosc" />
+
+    <TextView
+        android:id="@+id/tvLabelWysokosc"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBaseline="@+id/tvAccelerometer3"
+        android:layout_alignBottom="@+id/tvAccelerometer3"
+        android:layout_alignRight="@+id/tvLabelSzerokosc"
+        android:text="@string/wysokosc" />
+
+    <TextView
+        android:id="@+id/tvLabelGPSLONG"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/tvLabelSzerokosc"
+        android:layout_centerVertical="true"
+        android:text="Szerokosc geo" />
+
+    <TextView
+        android:id="@+id/TVGPSLATIT"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/tvAccelerometer1"
+        android:layout_alignTop="@+id/tvLabelGPSLONG"
+        android:text="Large Text"
+        android:textAppearance="?android:attr/textAppearanceLarge" />
+
+    <TextView
+        android:id="@+id/tvLabelGPSLATIT"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignRight="@+id/tvLabelGPSLONG"
+        android:layout_below="@+id/TVGPSLATIT"
+        android:layout_marginTop="16dp"
+        android:text="Wysokosc geo" />
+
+    <TextView
+        android:id="@+id/tvGPSLONG"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBaseline="@+id/tvLabelGPSLATIT"
+        android:layout_alignBottom="@+id/tvLabelGPSLATIT"
+        android:layout_alignLeft="@+id/TVGPSLATIT"
+        android:text="Large Text"
+        android:textAppearance="?android:attr/textAppearanceLarge" />
+
+</RelativeLayout>

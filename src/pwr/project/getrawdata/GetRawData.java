@@ -138,7 +138,6 @@ public class GetRawData extends Activity implements OnClickListener, SensorEvent
 					}
 					sr.pobieranieDanychACC(rawX, rawY, rawZ);
 					if(sr.czyPelnaACC){
-						//Log.i(getClass().getSimpleName(), sr.getSrednia()+"");
 					try {
 						 OutputStreamWriter outputStreamWriter = new OutputStreamWriter(openFileOutput("dataBlad.txt", Context.MODE_APPEND));
 					        outputStreamWriter.write(sr.bladACC.get(sr.ileDanych-1).x + " " + sr.bladACC.get(sr.ileDanych-1).y + " " + sr.bladACC.get(sr.ileDanych-1).z + "\n");

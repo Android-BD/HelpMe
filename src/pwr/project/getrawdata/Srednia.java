@@ -4,7 +4,7 @@ import java.util.ArrayList;
 
 public class Srednia {
 
-	ArrayList<WynikiGPS> wynikiGPS;
+	ArrayList<WynikiGPS> wynikiGPS;			//"Pozdrowienia dla dr'a Greblickiego :**, WE <33333333 AK!
 	ArrayList<WynikiACC> wynikiACC;
 	ArrayList<WynikiGPS> srednieWlasciweGPS;
 	ArrayList<WynikiGPS> srednieZeSredniejGPS;

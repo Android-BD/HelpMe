@@ -20,6 +20,8 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.androidquery.AQuery;
+
 public class GetRawData extends Activity implements OnClickListener, SensorEventListener, LocationListener{
 
 	Button getData;
@@ -39,7 +41,7 @@ public class GetRawData extends Activity implements OnClickListener, SensorEvent
 	private long mLastUpdate, mLastUpdateGPS;
 	
 	private final float mAlpha = 0.8f;
-
+	private AQuery aq;
 
 	
 	@Override
@@ -47,13 +49,9 @@ public class GetRawData extends Activity implements OnClickListener, SensorEvent
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.main);
 		
-
+		
 		sr = new Srednia();
-		tvDlugosc = (TextView) findViewById(R.id.tvAccelerometer1);
-		tvSzerokosc = (TextView) findViewById(R.id.tvAccelerometer2);
-		tvWysokosc = (TextView) findViewById(R.id.tvAccelerometer3);
-		tvSzerGEO = (TextView) findViewById(R.id.tvGPSLONG);
-		tvDlGEO = (TextView) findViewById(R.id.TVGPSLATIT);
+
 		
 		mSensorManager = (SensorManager)this.getSystemService(Context.SENSOR_SERVICE);
 		accelerometer = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);

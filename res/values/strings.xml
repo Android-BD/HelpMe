@@ -7,5 +7,9 @@
     <string name="dlugosc">Dlugosc</string>
     <string name="szerokosc">Szerokosc</string>
     <string name="wysokosc">Wysokosc</string>
+    <string name="start">START</string>
+    <string name="stop">STOP</string>
+    <string name="textStatus">STATUS</string>
+    <string name="imgStatusDesc">Status naszej aplikacji</string>
 
 </resources>

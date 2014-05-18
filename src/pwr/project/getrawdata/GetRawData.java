@@ -49,9 +49,9 @@ public class GetRawData extends Activity implements OnClickListener, SensorEvent
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.main);
 		
-		
+		aq = new AQuery(this);
 		sr = new Srednia();
-
+		
 		
 		mSensorManager = (SensorManager)this.getSystemService(Context.SENSOR_SERVICE);
 		accelerometer = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);

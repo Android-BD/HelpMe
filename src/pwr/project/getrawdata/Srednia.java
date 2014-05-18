@@ -23,8 +23,8 @@ public class Srednia {
 	int ileDanych = 0;
 
 	Srednia() {
-			wynikiGPS = new ArrayList<WynikiGPS>();
-			wynikiACC = new ArrayList<WynikiACC>();
+		wynikiGPS = new ArrayList<WynikiGPS>();
+		wynikiACC = new ArrayList<WynikiACC>();
 		srednieZeSredniejACC = new ArrayList<WynikiACC>();
 		srednieWlasciweACC = new ArrayList<WynikiACC>();
 		srednieZeSredniejGPS = new ArrayList<WynikiGPS>();
@@ -70,11 +70,11 @@ public class Srednia {
 	void liczenieSredniejGPS(){
 		float sumDl=0, sumSzer=0, srDl=0, srSzer=0; 
 		
-		for(WynikiGPS k: wynikiGPS)
-		{
+		for(WynikiGPS k: wynikiGPS){
 			sumDl+=k.dl;
 			sumSzer+=k.szer;
 		}
+		
 		srDl=sumDl/ILOSC;
 		srSzer=sumSzer/ILOSC;
 		srednieWlasciweGPS.add(new WynikiGPS(srDl, srSzer));
@@ -109,6 +109,7 @@ public class Srednia {
 		srY=sumY/ILOSC;
 		srZ=sumZ/ILOSC;
 		srednieWlasciweACC.add(new WynikiACC(srX, srY, srZ));
+
 		if(srednieZeSredniejACC.size()==0)
 			srednieZeSredniejACC.add(srednieWlasciweACC.get(0));
 		else{

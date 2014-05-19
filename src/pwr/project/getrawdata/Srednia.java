@@ -1,11 +1,18 @@
 package pwr.project.getrawdata;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.PriorityQueue;
 
 public class Srednia {
 
-	ArrayList<WynikiGPS> wynikiGPS;			//"Pozdrowienia dla dr'a Greblickiego :**, WE <33333333 AK!
-	ArrayList<WynikiACC> wynikiACC;			//OOOO MACARENA!! tralalala
+<<<<<<< HEAD
+	ArrayList<WynikiGPS> wynikiGPS;
+	ArrayList<WynikiACC> wynikiACC;
+	ArrayList<WynikiGPS> wynikiGPS;
+	ArrayList<WynikiACC> wynikiACC;
+	LinkedList<WynikiACC> srednieCalkowitaACC;
+>>>>>>> ui-change
 	ArrayList<WynikiGPS> srednieWlasciweGPS;
 	ArrayList<WynikiGPS> srednieZeSredniejGPS;
 	ArrayList<WynikiACC> srednieWlasciweACC;
@@ -21,10 +28,13 @@ public class Srednia {
 	boolean czyPelnaACC = false;
 	static final int ILOSC = 2000;
 	int ileDanych = 0;
+	static final int ILOSC_MINIMUM = 10;
+
 
 	Srednia() {
-			wynikiGPS = new ArrayList<WynikiGPS>();
-			wynikiACC = new ArrayList<WynikiACC>();
+		wynikiGPS = new ArrayList<WynikiGPS>();
+		wynikiACC = new ArrayList<WynikiACC>();
+		srednieCalkowitaACC = new LinkedList<WynikiACC>();
 		srednieZeSredniejACC = new ArrayList<WynikiACC>();
 		srednieWlasciweACC = new ArrayList<WynikiACC>();
 		srednieZeSredniejGPS = new ArrayList<WynikiGPS>();
@@ -36,11 +46,7 @@ public class Srednia {
 		for(int i = 0; i < ILOSC; i++){
 			wynikiGPS.add(new WynikiGPS(0, 0));
 			wynikiACC.add(new WynikiACC(0, 0, 0));
-		
 		}
-		
-		
-
 	}
 
 	void pobieranieDanychGPS(float a, float b) {
@@ -66,15 +72,15 @@ public class Srednia {
 			liczenieSredniejACC();
 		}
 	}
-	
+
 	void liczenieSredniejGPS(){
-		float sumDl=0, sumSzer=0, srDl=0, srSzer=0; 
-		
-		for(WynikiGPS k: wynikiGPS)
-		{
+		float sumDl=0, sumSzer=0, srDl=0, srSzer=0;
+
+		for(WynikiGPS k: wynikiGPS){
 			sumDl+=k.dl;
 			sumSzer+=k.szer;
 		}
+
 		srDl=sumDl/ILOSC;
 		srSzer=sumSzer/ILOSC;
 		srednieWlasciweGPS.add(new WynikiGPS(srDl, srSzer));
@@ -88,17 +94,17 @@ public class Srednia {
 		}
 		float bladDl = srednieWlasciweGPS.get(srednieWlasciweGPS.size()-1).dl-srednieZeSredniejGPS.get(srednieZeSredniejGPS.size()-1).dl;
 		float bladSzer = srednieWlasciweGPS.get(srednieWlasciweGPS.size()-1).szer-srednieZeSredniejGPS.get(srednieZeSredniejGPS.size()-1).szer;
-		
+
 		bladGPS.add(new WynikiGPS(bladDl, bladSzer));
 	}
-	
+
 	float getSrednia(){
 		return bladACC.get(bladACC.size()-1).x;
 	}
-	
+
 	void liczenieSredniejACC(){
-		float sumX=0, sumY=0,sumZ=0, srX=0, srY=0,srZ=0; 
-		
+		float sumX=0, sumY=0,sumZ=0, srX=0, srY=0,srZ=0;
+
 		for(WynikiACC k: wynikiACC)
 		{
 			sumX+=k.x;
@@ -109,6 +115,7 @@ public class Srednia {
 		srY=sumY/ILOSC;
 		srZ=sumZ/ILOSC;
 		srednieWlasciweACC.add(new WynikiACC(srX, srY, srZ));
+
 		if(srednieZeSredniejACC.size()==0)
 			srednieZeSredniejACC.add(srednieWlasciweACC.get(0));
 		else{
@@ -118,13 +125,35 @@ public class Srednia {
 			srZ = ((ILOSC*srednieZeSredniejACC.get(srednieZeSredniejACC.size()-1).z) + w.z)/(ILOSC + 1);
 			srednieZeSredniejACC.add(new WynikiACC(srX, srY, srZ));
 		}
-		
+
 		float bladX = srednieWlasciweACC.get(srednieWlasciweACC.size()-1).x-srednieZeSredniejACC.get(srednieZeSredniejACC.size()-1).x;
 		float bladY = srednieWlasciweACC.get(srednieWlasciweACC.size()-1).y-srednieZeSredniejACC.get(srednieZeSredniejACC.size()-1).y;
 		float bladZ = srednieWlasciweACC.get(srednieWlasciweACC.size()-1).z-srednieZeSredniejACC.get(srednieZeSredniejACC.size()-1).z;
-		
+
 		bladACC.add(new WynikiACC(bladX, bladY,bladZ));
 		ileDanych++;
+	}
+
+	float sredniaCalkowitaZWieluPomiarow(float x, float y, float z){
+		if(srednieCalkowitaACC.size() < ILOSC_MINIMUM){
+			srednieCalkowitaACC.add(new WynikiACC(x, y, z));
+		} else{
+			srednieCalkowitaACC.poll();
+			srednieCalkowitaACC.add(new WynikiACC(x, y, z));
+		}
+
+
+		return getSredniaCalkowita(srednieCalkowitaACC);
+	}
+
+	float getSredniaCalkowita(LinkedList<WynikiACC> p){
+		float wynik = 0;
+		double suma = 0;
+		for (WynikiACC a: p){
+			suma += Math.sqrt(a.x*a.x+a.y*a.y+a.z*a.z);
+		}
+		wynik = (float)suma/p.size();
+		return wynik;
 	}
 }
 

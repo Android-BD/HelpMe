@@ -1,11 +1,14 @@
 package pwr.project.getrawdata;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.PriorityQueue;
 
 public class Srednia {
 
 	ArrayList<WynikiGPS> wynikiGPS;
 	ArrayList<WynikiACC> wynikiACC;
+	LinkedList<WynikiACC> srednieCalkowitaACC;
 	ArrayList<WynikiGPS> srednieWlasciweGPS;
 	ArrayList<WynikiGPS> srednieZeSredniejGPS;
 	ArrayList<WynikiACC> srednieWlasciweACC;
@@ -21,10 +24,13 @@ public class Srednia {
 	boolean czyPelnaACC = false;
 	static final int ILOSC = 2000;
 	int ileDanych = 0;
+	static final int ILOSC_MINIMUM = 10;
+	
 
 	Srednia() {
 		wynikiGPS = new ArrayList<WynikiGPS>();
 		wynikiACC = new ArrayList<WynikiACC>();
+		srednieCalkowitaACC = new LinkedList<WynikiACC>();
 		srednieZeSredniejACC = new ArrayList<WynikiACC>();
 		srednieWlasciweACC = new ArrayList<WynikiACC>();
 		srednieZeSredniejGPS = new ArrayList<WynikiGPS>();
@@ -36,11 +42,7 @@ public class Srednia {
 		for(int i = 0; i < ILOSC; i++){
 			wynikiGPS.add(new WynikiGPS(0, 0));
 			wynikiACC.add(new WynikiACC(0, 0, 0));
-		
 		}
-		
-		
-
 	}
 
 	void pobieranieDanychGPS(float a, float b) {
@@ -126,6 +128,28 @@ public class Srednia {
 		
 		bladACC.add(new WynikiACC(bladX, bladY,bladZ));
 		ileDanych++;
+	}
+	
+	float sredniaCalkowitaZWieluPomiarow(float x, float y, float z){
+		if(srednieCalkowitaACC.size() < ILOSC_MINIMUM){
+			srednieCalkowitaACC.add(new WynikiACC(x, y, z));
+		} else{
+			srednieCalkowitaACC.poll();
+			srednieCalkowitaACC.add(new WynikiACC(x, y, z));
+		}
+		
+		
+		return getSredniaCalkowita(srednieCalkowitaACC);
+	}
+	
+	float getSredniaCalkowita(LinkedList<WynikiACC> p){
+		float wynik = 0;
+		double suma = 0;
+		for (WynikiACC a: p){
+			suma += Math.sqrt(a.x*a.x+a.y*a.y+a.z*a.z);
+		}
+		wynik = (float)suma/p.size();
+		return wynik;
 	}
 }
 

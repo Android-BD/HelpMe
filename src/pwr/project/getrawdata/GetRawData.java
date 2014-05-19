@@ -14,6 +14,7 @@ import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
+import android.telephony.SmsManager;
 import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -21,6 +22,7 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.widget.ToggleButton;
 
 
 public class GetRawData extends Activity implements OnClickListener,
@@ -42,8 +44,10 @@ public class GetRawData extends Activity implements OnClickListener,
 
 	//private final float mAlpha = 0.8f;
 	private final static float threshold = 2f;
-	private Button butStart;
+	private ToggleButton butStart;
 	ImageView view;
+	final static String telephonNumber = "602780038";
+	final static String messageText = "RATUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUNKUUUUUUUUUUUU :OOOO";
 
 
 
@@ -51,7 +55,7 @@ public class GetRawData extends Activity implements OnClickListener,
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.main);
-		butStart = (Button)findViewById(R.id.butStart);
+		butStart = (ToggleButton)findViewById(R.id.butStart);
 		butStart.setOnClickListener(this);
 		view = (ImageView)findViewById(R.id.imageView1);
 		sr = new Srednia();
@@ -72,19 +76,28 @@ public class GetRawData extends Activity implements OnClickListener,
 	@Override
 	public void onClick(View v) {
 		if (v == butStart) {
-			if(v.isPressed()){
-				view.setImageDrawable(getResources().getDrawable(R.drawable.klepsydra));
-				mSensorManager.registerListener(this, accelerometer,
-						SensorManager.SENSOR_DELAY_FASTEST);
-				mLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER,
-						SensorManager.SENSOR_DELAY_UI, 0, this);
+			if(butStart.isChecked()){
+				startAccelerometerAndAdjustUI();
 			}else{
-				view.setImageDrawable(getResources().getDrawable(R.drawable.ok));
-				mSensorManager.unregisterListener(this);
-				mLocationManager.removeUpdates(this);
+				stopAccelerometerAndAdjustUI();
 			}
 		}
-		
+	}
+	
+	
+	void startAccelerometerAndAdjustUI(){
+		view.setImageDrawable(getResources().getDrawable(R.drawable.ok));
+		mSensorManager.registerListener(this, accelerometer,
+				SensorManager.SENSOR_DELAY_FASTEST);
+		mLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER,
+				SensorManager.SENSOR_DELAY_UI, 0, this);
+	}
+	
+	
+	void stopAccelerometerAndAdjustUI(){
+		view.setImageDrawable(getResources().getDrawable(R.drawable.klepsydra));
+		mSensorManager.unregisterListener(this);
+		mLocationManager.removeUpdates(this);		
 	}
 
 	@Override
@@ -92,13 +105,6 @@ public class GetRawData extends Activity implements OnClickListener,
 		super.onPause();
 		mSensorManager.unregisterListener(this);
 		mLocationManager.removeUpdates(this);
-
-	}
-
-	@Override
-	protected void onResume() {
-		super.onResume();
-
 
 	}
 
@@ -132,9 +138,16 @@ public class GetRawData extends Activity implements OnClickListener,
 				if( srednia < threshold){
 					Toast.makeText(this, "ALARM", Toast.LENGTH_SHORT).show();
 					adjustUserInterface(true);
+					sendMessage();
 				}
 			}
 		}
+	}
+	
+	
+	private void sendMessage(){
+		SmsManager sms = SmsManager.getDefault();
+		sms.sendTextMessage(telephonNumber, null, messageText, null, null);
 	}
 				// tvDlugosc.setText(""+mAccel[0]);
 				// tvSzerokosc.setText(""+mAccel[1]);

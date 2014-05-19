@@ -2,17 +2,13 @@ package pwr.project.getrawdata;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
-import java.util.PriorityQueue;
 
 public class Srednia {
 
-<<<<<<< HEAD
-	ArrayList<WynikiGPS> wynikiGPS;
-	ArrayList<WynikiACC> wynikiACC;
+
 	ArrayList<WynikiGPS> wynikiGPS;
 	ArrayList<WynikiACC> wynikiACC;
 	LinkedList<WynikiACC> srednieCalkowitaACC;
->>>>>>> ui-change
 	ArrayList<WynikiGPS> srednieWlasciweGPS;
 	ArrayList<WynikiGPS> srednieZeSredniejGPS;
 	ArrayList<WynikiACC> srednieWlasciweACC;

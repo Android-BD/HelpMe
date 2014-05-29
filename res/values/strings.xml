@@ -2,7 +2,6 @@
 <resources>
 
     <string name="app_name">Help me!</string>
-    <string name="action_settings">Settings</string>
     <string name="dlugosc">Dlugosc</string>
     <string name="szerokosc">Szerokosc</string>
     <string name="wysokosc">Wysokosc</string>
@@ -10,5 +9,35 @@
     <string name="stop">STOP</string>
     <string name="textStatus">STATUS: </string>
     <string name="imgStatusDesc">Status naszej aplikacji</string>
+    <string name="telephone_title_pref">Numer telefonu</string>
+    <string name="telephon_summary_preference">Numer do osoby ktora ma zastac powiadomiona</string>
+    <string name="send_true_summary">Wysylaj powiadomienia sms</string>
+    <string name="send_false_summary">Nie wysylaj powiadomienia sms</string>
+    <string name="send_message_pref">Powiadomienia sms</string>
+    <string name="settings">settings</string>
+    <string name="help">help</string>
+    <string name="about">about</string>
+    <string name="threshold">Threshold</string>
+    <string name="select_threshold">Wybierz wartosc graniczna przyspieszenia</string>
 
-</resources>
+    <string-array name="Thresholds">
+        <item>0.5</item>
+        <item>0.75</item>
+        <item>1</item>
+        <item>1.25</item>
+        <item>1.5</item>
+        <item>1.75</item>
+        <item>2</item>
+        <item>2.25</item>
+        <item>2.5</item>
+        <item>2.75</item>
+        <item>3</item>
+        <item>3.25</item>
+        <item>3.5</item>
+        <item>3.75</item>
+        <item>4</item>
+    </string-array>
+        <string name="threshold_summary">"Wybierz wartosc graniczna "</string>
+        <string name="show_log">Pokaz Log</string>
+        <string name="clear_log">Clear Log</string>
+</resources>

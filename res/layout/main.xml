@@ -22,7 +22,8 @@
             android:layout_weight="1"
             android:gravity="center"
             android:text="@string/textStatus"
-            android:textSize="25sp" />
+            android:textSize="25sp"
+            tools:ignore="NestedWeights" />
 
         <ImageView
             android:id="@+id/imageView1"
@@ -52,6 +53,26 @@
             android:textOff="@string/start"
             android:textOn="@string/stop"
             android:textSize="50sp" />
+
+        <Button
+            android:id="@+id/butLog"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_below="@+id/butStart"
+            android:layout_marginRight="48dp"
+            android:layout_marginTop="21dp"
+            android:text="@string/show_log" />
+
+        <Button
+            android:id="@+id/butClearLog"
+            style="?android:attr/buttonStyleSmall"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignTop="@+id/butLog"
+            android:layout_marginRight="35dp"
+            android:layout_toLeftOf="@+id/butLog"
+            android:text="@string/clear_log" />
 
     </RelativeLayout>
 

@@ -46,7 +46,7 @@ public class GetRawData extends Activity implements OnClickListener,
 	TextView tvSzerGEO;
 	TextView tvDlGEO;
 	private Sensor accelerometer;
-	private Srednia sr;
+	private Srednia<WynikiACC> sr;
 	private SharedPreferences prefs;
 	private SensorManager mSensorManager;
 	private LocationManager mLocationManager;
@@ -77,7 +77,7 @@ public class GetRawData extends Activity implements OnClickListener,
 		butClearLog.setOnClickListener(this);
 		butShowLog.setOnClickListener(this);
 		view = (ImageView) findViewById(R.id.imageView1);
-		sr = new Srednia();
+		sr = new Srednia<WynikiACC>();
 		mSensorManager = (SensorManager) this
 				.getSystemService(Context.SENSOR_SERVICE);
 		accelerometer = mSensorManager
@@ -174,15 +174,15 @@ public class GetRawData extends Activity implements OnClickListener,
 				// mAccel[2] = highPass(rawZ, mGravity[2]);
 				//
 
-				float srednia = sr.sredniaCalkowitaZWieluPomiarow(rawX, rawY,
-						rawZ);
+				float srednia = sr.sredniaCalkowitaZWieluPomiarow(new WynikiACC(rawX, rawY,
+						rawZ));
 				Log.d(getClass().getSimpleName(), "Srednia = " + srednia);
 				log("Srednia = " + srednia);
 				if (srednia < threshold && isMonitoring) {
 					Toast.makeText(this, "ALARM, threshold = " + threshold,
 							Toast.LENGTH_SHORT).show();
 					maintainAlarm();
-					sr.srednieCalkowitaACC.clear();
+					sr.wynikiPomiarow.clear();
 					isMonitoring = false;
 					sendMessage();
 				}

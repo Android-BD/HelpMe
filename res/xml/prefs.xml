@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android" >
+
+    <EditTextPreference
+        android:key="telephoneNumber"
+        android:summary="@string/telephon_summary_preference"
+        android:title="@string/telephone_title_pref" >
+    </EditTextPreference>
+
+    <CheckBoxPreference
+        android:key="sendMessage"
+        android:summaryOff="@string/send_false_summary"
+        android:summaryOn="@string/send_true_summary"
+        android:title="@string/send_message_pref" />
+
+    <ListPreference
+        android:dialogTitle="@string/threshold"
+        android:entries="@array/Thresholds" android:entryValues="@array/Thresholds" android:key="threshold" android:title="@string/threshold" android:summary="@string/threshold_summary"/>
+
+</PreferenceScreen>

@@ -1,8 +1,5 @@
 package pwr.project.getrawdata;
 
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 
 import android.app.Activity;
@@ -31,7 +28,6 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ListView;
-import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ToggleButton;
 
@@ -40,18 +36,13 @@ public class GetRawData extends Activity implements OnClickListener,
 
 	Button butShowLog;
 	Button butClearLog;
-	TextView tvWysokosc;
-	TextView tvSzerokosc;
-	TextView tvDlugosc;
-	TextView tvSzerGEO;
-	TextView tvDlGEO;
 	private Sensor accelerometer;
 	private Srednia<WynikiACC> sr;
 	private SharedPreferences prefs;
 	private SensorManager mSensorManager;
 	private LocationManager mLocationManager;
-
-	private long mLastUpdate, mLastUpdateGPS;
+	private Location middleOfSafeZone;
+	private float maximumSafeDistance = 1000;
 	private boolean isMonitoring = false;
 	// private final float mAlpha = 0.8f;
 	private static float threshold;
@@ -87,9 +78,11 @@ public class GetRawData extends Activity implements OnClickListener,
 					Toast.LENGTH_SHORT).show();
 		}
 		mLocationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-		mLastUpdate = System.currentTimeMillis();
-		mLastUpdateGPS = System.currentTimeMillis();
-
+		if(mLocationManager == null){
+			Toast.makeText(this, "No GPS available",
+					Toast.LENGTH_SHORT).show();
+			finish();
+		}
 	}
 
 	@Override
@@ -105,6 +98,16 @@ public class GetRawData extends Activity implements OnClickListener,
 		super.onResume();
 		threshold = Float.parseFloat(prefs
 				.getString(thresholdPreference, "2.0"));
+		mLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER,
+				SensorManager.SENSOR_DELAY_UI, 0, this);
+//		mLocationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER,
+//				SensorManager.SENSOR_DELAY_UI, 0, this);
+		middleOfSafeZone = mLocationManager
+				.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+		Log.i(getClass().getSimpleName(),
+				"middleOfSafeZone = " + middleOfSafeZone.getLongitude() + " "
+						+ middleOfSafeZone.getLatitude());
+
 	}
 
 	@Override
@@ -139,14 +142,13 @@ public class GetRawData extends Activity implements OnClickListener,
 		view.setImageDrawable(getResources().getDrawable(R.drawable.ok));
 		mSensorManager.registerListener(this, accelerometer,
 				SensorManager.SENSOR_DELAY_FASTEST);
-		mLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER,
-				SensorManager.SENSOR_DELAY_UI, 0, this);
+
 	}
 
 	void stopAccelerometerAndAdjustUI() {
 		view.setImageDrawable(getResources().getDrawable(R.drawable.klepsydra));
 		mSensorManager.unregisterListener(this);
-		mLocationManager.removeUpdates(this);
+		//mLocationManager.removeUpdates(this);
 	}
 
 	@Override
@@ -158,42 +160,34 @@ public class GetRawData extends Activity implements OnClickListener,
 	public void onSensorChanged(SensorEvent event) {
 
 		if (event.sensor.getType() == Sensor.TYPE_ACCELEROMETER) {
-			long actualTime = System.currentTimeMillis();
-			if (actualTime - mLastUpdate > 10) {
-				mLastUpdate = actualTime;
-				float rawX = event.values[0];
-				float rawY = event.values[1];
-				float rawZ = event.values[2];
+			float rawX = event.values[0];
+			float rawY = event.values[1];
+			float rawZ = event.values[2];
 
-				// mGravity[0] = lowPass(rawX, mGravity[0]);
-				// mGravity[1] = lowPass(rawY, mGravity[1]);
-				// mGravity[2] = lowPass(rawZ, mGravity[2]);
-				//
-				// mAccel[0] = highPass(rawX, mGravity[0]);
-				// mAccel[1] = highPass(rawY, mGravity[1]);
-				// mAccel[2] = highPass(rawZ, mGravity[2]);
-				//
-
-				float srednia = sr.sredniaCalkowitaZWieluPomiarow(new WynikiACC(rawX, rawY,
-						rawZ));
-				Log.d(getClass().getSimpleName(), "Srednia = " + srednia);
-				log("Srednia = " + srednia);
-				if (srednia < threshold && isMonitoring) {
-					Toast.makeText(this, "ALARM, threshold = " + threshold,
-							Toast.LENGTH_SHORT).show();
-					maintainAlarm();
-					sr.wynikiPomiarow.clear();
-					isMonitoring = false;
-					sendMessage();
-				}
+			float srednia = sr.sredniaCalkowitaZWieluPomiarow(new WynikiACC(
+					rawX, rawY, rawZ));
+			log("Srednia = " + srednia);
+			if (srednia < threshold && isMonitoring) {
+				raiseAlarm();
 			}
 		}
+	}
+
+	private void raiseAlarm() {
+		Toast.makeText(this, "ALARM, threshold = " + threshold,
+				Toast.LENGTH_SHORT).show();
+		maintainAlarm();
+
 	}
 
 	private void maintainAlarm() {
 		view.setImageDrawable(getResources().getDrawable(R.drawable.error));
 		mSensorManager.unregisterListener(this);
-		mLocationManager.removeUpdates(this);
+		//mLocationManager.removeUpdates(this);
+		sendMessage();
+		sr.wynikiPomiarow.clear();
+		isMonitoring = false;
+
 	}
 
 	private void sendMessage() {
@@ -207,7 +201,6 @@ public class GetRawData extends Activity implements OnClickListener,
 					+ telephonNumber);
 
 		}
-		Log.i(getClass().getSimpleName(), "triggered");
 	}
 
 	void adjustUserInterface(boolean isTriggerd) {
@@ -218,25 +211,20 @@ public class GetRawData extends Activity implements OnClickListener,
 
 	@Override
 	public void onLocationChanged(Location location) {
-		long actualTime = System.currentTimeMillis();
-		if (actualTime - mLastUpdateGPS > 500) {
-			mLastUpdateGPS = actualTime;
+		Log.i(getClass().getSimpleName(),
+				"location = " + location.getLongitude() + " "
+						+ location.getLatitude());
 
-			tvDlGEO.setText("" + location.getLongitude());
-			tvSzerGEO.setText("" + location.getLatitude());
-			try {
-				OutputStreamWriter outputStreamWriter = new OutputStreamWriter(
-						openFileOutput("dataGPS.txt", Context.MODE_APPEND));
-				outputStreamWriter.write(location.getLongitude() + " "
-						+ location.getLatitude() + "\n");
-				outputStreamWriter.close();
-			} catch (FileNotFoundException e) {
-				e.printStackTrace();
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
+		isInSafeZone(location);
+	}
+
+	private boolean isInSafeZone(Location actual) {
+		if (actual.distanceTo(middleOfSafeZone) > maximumSafeDistance) {
+			raiseAlarm();
+			return false;
 		}
 
+		return true;
 	}
 
 	@Override

@@ -51,6 +51,7 @@ public class GetRawData extends Activity implements OnClickListener,
 	final static String thresholdPreference = "threshold";
 	final static String sendPreference = "sendMessage";
 	final static String telephonNumberPreference = "telephonNumber";
+	final static String maxDistPreference = "safeDistance";
 	// final static String telephonNumber = "602780038";
 	private ArrayList<String> LogList;
 	final static String messageText = "RATUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUNKUUUUUUUUUUUU :OOOO";
@@ -96,6 +97,7 @@ public class GetRawData extends Activity implements OnClickListener,
 	@Override
 	protected void onResume() {
 		super.onResume();
+		assert(mLocationManager!=null);
 		threshold = Float.parseFloat(prefs
 				.getString(thresholdPreference, "2.0"));
 		mLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER,
@@ -104,9 +106,13 @@ public class GetRawData extends Activity implements OnClickListener,
 //				SensorManager.SENSOR_DELAY_UI, 0, this);
 		middleOfSafeZone = mLocationManager
 				.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-		Log.i(getClass().getSimpleName(),
+		if(middleOfSafeZone != null){
+			Log.i(getClass().getSimpleName(),
 				"middleOfSafeZone = " + middleOfSafeZone.getLongitude() + " "
 						+ middleOfSafeZone.getLatitude());
+		}
+		String maxDist = prefs.getString(maxDistPreference, "1000");
+		maximumSafeDistance = Float.parseFloat(maxDist);
 
 	}
 
@@ -174,6 +180,7 @@ public class GetRawData extends Activity implements OnClickListener,
 	}
 
 	private void raiseAlarm() {
+		view.setImageDrawable(getResources().getDrawable(R.drawable.error));
 		Toast.makeText(this, "ALARM, threshold = " + threshold,
 				Toast.LENGTH_SHORT).show();
 		maintainAlarm();
@@ -181,7 +188,6 @@ public class GetRawData extends Activity implements OnClickListener,
 	}
 
 	private void maintainAlarm() {
-		view.setImageDrawable(getResources().getDrawable(R.drawable.error));
 		mSensorManager.unregisterListener(this);
 		//mLocationManager.removeUpdates(this);
 		sendMessage();
@@ -220,7 +226,8 @@ public class GetRawData extends Activity implements OnClickListener,
 
 	private boolean isInSafeZone(Location actual) {
 		if (actual.distanceTo(middleOfSafeZone) > maximumSafeDistance) {
-			raiseAlarm();
+			if(isMonitoring)
+				raiseAlarm();
 			return false;
 		}
 

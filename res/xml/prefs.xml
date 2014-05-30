@@ -16,5 +16,6 @@
     <ListPreference
         android:dialogTitle="@string/threshold"
         android:entries="@array/Thresholds" android:entryValues="@array/Thresholds" android:key="threshold" android:title="@string/threshold" android:summary="@string/threshold_summary"/>
+    <EditTextPreference android:key="safeDistance" android:title="@string/maxSafeDistance" android:summary="@string/max_safe_distance_summary" android:defaultValue="1000"/>
 
 </PreferenceScreen>

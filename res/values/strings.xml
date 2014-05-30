@@ -40,4 +40,6 @@
         <string name="threshold_summary">"Wybierz wartosc graniczna "</string>
         <string name="show_log">Pokaz Log</string>
         <string name="clear_log">Clear Log</string>
+        <string name="maxSafeDistance">Maksymalny promien spaceru</string>
+        <string name="max_safe_distance_summary">Maksymalna dozwolona odleglosc od domu</string>
 </resources>

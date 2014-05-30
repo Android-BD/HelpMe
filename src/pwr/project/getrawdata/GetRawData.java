@@ -52,6 +52,7 @@ public class GetRawData extends Activity implements OnClickListener,
 	final static String sendPreference = "sendMessage";
 	final static String telephonNumberPreference = "telephonNumber";
 	final static String maxDistPreference = "safeDistance";
+	private static boolean isSendingMessage;
 	// final static String telephonNumber = "602780038";
 	private ArrayList<String> LogList;
 	final static String messageText = "RATUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUNKUUUUUUUUUUUU :OOOO";
@@ -79,9 +80,8 @@ public class GetRawData extends Activity implements OnClickListener,
 					Toast.LENGTH_SHORT).show();
 		}
 		mLocationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-		if(mLocationManager == null){
-			Toast.makeText(this, "No GPS available",
-					Toast.LENGTH_SHORT).show();
+		if (mLocationManager == null) {
+			Toast.makeText(this, "No GPS available", Toast.LENGTH_SHORT).show();
 			finish();
 		}
 	}
@@ -97,19 +97,18 @@ public class GetRawData extends Activity implements OnClickListener,
 	@Override
 	protected void onResume() {
 		super.onResume();
-		assert(mLocationManager!=null);
+		assert (mLocationManager != null);
+		isSendingMessage = prefs.getBoolean(sendPreference, false);
 		threshold = Float.parseFloat(prefs
 				.getString(thresholdPreference, "2.0"));
 		mLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER,
 				SensorManager.SENSOR_DELAY_UI, 0, this);
-//		mLocationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER,
-//				SensorManager.SENSOR_DELAY_UI, 0, this);
 		middleOfSafeZone = mLocationManager
 				.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-		if(middleOfSafeZone != null){
+		if (middleOfSafeZone != null) {
 			Log.i(getClass().getSimpleName(),
-				"middleOfSafeZone = " + middleOfSafeZone.getLongitude() + " "
-						+ middleOfSafeZone.getLatitude());
+					"middleOfSafeZone = " + middleOfSafeZone.getLongitude()
+							+ " " + middleOfSafeZone.getLatitude());
 		}
 		String maxDist = prefs.getString(maxDistPreference, "1000");
 		maximumSafeDistance = Float.parseFloat(maxDist);
@@ -121,6 +120,8 @@ public class GetRawData extends Activity implements OnClickListener,
 		if (v == butStart) {
 			if (butStart.isChecked()) {
 				isMonitoring = true;
+				middleOfSafeZone = mLocationManager
+						.getLastKnownLocation(LocationManager.GPS_PROVIDER);
 				startAccelerometerAndAdjustUI();
 			} else {
 				isMonitoring = false;
@@ -154,7 +155,7 @@ public class GetRawData extends Activity implements OnClickListener,
 	void stopAccelerometerAndAdjustUI() {
 		view.setImageDrawable(getResources().getDrawable(R.drawable.klepsydra));
 		mSensorManager.unregisterListener(this);
-		//mLocationManager.removeUpdates(this);
+		// mLocationManager.removeUpdates(this);
 	}
 
 	@Override
@@ -188,24 +189,22 @@ public class GetRawData extends Activity implements OnClickListener,
 	}
 
 	private void maintainAlarm() {
-		mSensorManager.unregisterListener(this);
-		//mLocationManager.removeUpdates(this);
+		// mLocationManager.removeUpdates(this);
 		sendMessage();
 		sr.wynikiPomiarow.clear();
 		isMonitoring = false;
+		mSensorManager.unregisterListener(this);
 
 	}
 
 	private void sendMessage() {
-
-		if (prefs.getBoolean(sendPreference, false)) {
+		if (isSendingMessage) {
 			String telephonNumber = prefs.getString(telephonNumberPreference,
 					"602780038");
 			SmsManager sms = SmsManager.getDefault();
 			sms.sendTextMessage(telephonNumber, null, messageText, null, null);
 			Log.i(getClass().getSimpleName(), "Message sent to: "
 					+ telephonNumber);
-
 		}
 	}
 
@@ -226,7 +225,7 @@ public class GetRawData extends Activity implements OnClickListener,
 
 	private boolean isInSafeZone(Location actual) {
 		if (actual.distanceTo(middleOfSafeZone) > maximumSafeDistance) {
-			if(isMonitoring)
+			if (isMonitoring)
 				raiseAlarm();
 			return false;
 		}

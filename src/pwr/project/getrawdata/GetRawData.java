@@ -3,7 +3,7 @@ package pwr.project.getrawdata;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Locale;
-
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -46,7 +46,7 @@ public class GetRawData extends Activity implements OnClickListener,
 	private Location middleOfSafeZone;
 	private float maximumSafeDistance = 1000;
 	private boolean isMonitoring = false;
-	private static float threshold = 3.5f;
+	static final float threshold = 3.5f;
 	private ToggleButton butStart;
 	ImageView view;
 	final static String messageTextPreference = "textMessage";
@@ -98,7 +98,8 @@ public class GetRawData extends Activity implements OnClickListener,
 	@Override
 	protected void onResume() {
 		super.onResume();
-		assert (mLocationManager != null);
+		mSensorManager.registerListener(this, accelerometer,
+				SensorManager.SENSOR_DELAY_FASTEST);
 		isSendingMessage = prefs.getBoolean(sendPreference, false);
 		mLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER,
 				0, 0, this);
@@ -121,31 +122,39 @@ public class GetRawData extends Activity implements OnClickListener,
 	public void onClick(View v) {
 		if (v == butStart) {
 			if (butStart.isChecked()) {
-				isMonitoring = true;
-				middleOfSafeZone = mLocationManager
-						.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-				startAccelerometerAndAdjustUI();
-				currentLocation = middleOfSafeZone;
-			} else {
-				isMonitoring = false;
-				stopAccelerometerAndAdjustUI();
+				Intent i = new Intent(this, MonitoringService.class);
+				startService(i);
+//				isMonitoring = true;
+//				middleOfSafeZone = mLocationManager
+//						.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+//				startAccelerometerAndAdjustUI();
+//				currentLocation = middleOfSafeZone;
+//			} else {
+//				isMonitoring = false;
+//				stopAccelerometerAndAdjustUI();
 			}
+			
 		} else if (v == butShowLog) {
-			AlertDialog.Builder logDialog = new AlertDialog.Builder(this);
-			logDialog.setTitle("Log akcelerometru");
-			ListView logListView = new ListView(this);
-			ArrayAdapter<String> logListAdapter = new ArrayAdapter<String>(
-					this, android.R.layout.simple_list_item_1,
-					android.R.id.text1, LogList);
-			logListView.setAdapter(logListAdapter);
-			logDialog.setView(logListView);
-			final Dialog dial = logDialog.create();
+			final Dialog dial = createAlertDialog();
 			dial.show();
+			
 		} else if (v == butClearLog) {
 			LogList.clear();
 			Toast.makeText(this, "Log cleared", Toast.LENGTH_SHORT).show();
 		}
 
+	}
+	
+	private Dialog createAlertDialog(){
+		AlertDialog.Builder logDialog = new AlertDialog.Builder(this);
+		logDialog.setTitle("Log akcelerometru");
+		ListView logListView = new ListView(this);
+		ArrayAdapter<String> logListAdapter = new ArrayAdapter<String>(
+				this, android.R.layout.simple_list_item_1,
+				android.R.id.text1, LogList);
+		logListView.setAdapter(logListAdapter);
+		logDialog.setView(logListView);
+		return logDialog.create();
 	}
 
 	void startAccelerometerAndAdjustUI() {
@@ -183,8 +192,6 @@ public class GetRawData extends Activity implements OnClickListener,
 
 	private void raiseAlarm() {
 		view.setImageDrawable(getResources().getDrawable(R.drawable.error));
-		Toast.makeText(this, "ALARM, threshold = " + threshold,
-				Toast.LENGTH_SHORT).show();
 		maintainAlarm();
 
 	}
@@ -208,24 +215,28 @@ public class GetRawData extends Activity implements OnClickListener,
 			sms.sendTextMessage(telephonNumber, null, messageText, null, null);
 			Log.i(getClass().getSimpleName(), "Message sent to: "
 					+ telephonNumber);
+			Toast.makeText(this, "ALARM, message sento to = " + telephonNumber,
+					Toast.LENGTH_SHORT).show();
 		}
 	}
 
+	@SuppressLint("DefaultLocale")
 	private String parseTextMessage(String message) {
 		String resultMessage;
-		if(currentLocation != null){
+		if (currentLocation != null) {
 			resultMessage = message.replace("%l", "" + "dlugosc = "
-				+ currentLocation.getLongitude() + " szerokosc = "
-				+ currentLocation.getLatitude());
+					+ currentLocation.getLongitude() + " szerokosc = "
+					+ currentLocation.getLatitude());
 		} else {
-			resultMessage = message.replace("%l","\"Brak informacji o lokalizacji!\"");
+			resultMessage = message.replace("%l",
+					"\"Brak informacji o lokalizacji!\"");
 		}
 		Calendar c = Calendar.getInstance();
 		String date = String.format(Locale.ENGLISH, "%d:%d:%d %d/%d/%d",
 				c.get(Calendar.HOUR_OF_DAY), c.get(Calendar.MINUTE),
 				c.get(Calendar.SECOND), c.get(Calendar.DAY_OF_MONTH),
 				c.get(Calendar.MONTH), c.get(Calendar.YEAR));
-		
+
 		resultMessage = resultMessage.replace("%d", date);
 		return resultMessage;
 	}

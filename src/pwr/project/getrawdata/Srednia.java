@@ -8,7 +8,7 @@ public class Srednia<T extends Wyniki> {
 	LinkedList<T> wynikiPomiarow;
 	float sredniaGPS;
 	float sredniaACC;
-	static final int ILOSC_MINIMUM = 10;
+	static final int ILOSC_POMIAROW = 10;
 
 
 	Srednia() {
@@ -19,7 +19,7 @@ public class Srednia<T extends Wyniki> {
 
 
 	float sredniaCalkowitaZWieluPomiarow(T a){
-		if(wynikiPomiarow.size() < ILOSC_MINIMUM){
+		if(wynikiPomiarow.size() < ILOSC_POMIAROW){
 			wynikiPomiarow.add(a);
 		} else{
 			wynikiPomiarow.poll();
@@ -30,13 +30,13 @@ public class Srednia<T extends Wyniki> {
 		return getSredniaCalkowita(wynikiPomiarow);
 	}
 
-	private float getSredniaCalkowita(LinkedList<T> p){
+	private float getSredniaCalkowita(LinkedList<T> p) {
 		float wynik = 0;
 		double suma = 0;
-		for (T a: p){
+		for (T a : p) {
 			suma += a.dlugoscWektora();
 		}
-		wynik = (float)suma/p.size();
+		wynik = (float) suma / p.size();
 		return wynik;
 	}
 }

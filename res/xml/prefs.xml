@@ -13,9 +13,15 @@
         android:summaryOn="@string/send_true_summary"
         android:title="@string/send_message_pref" />
 
-    <ListPreference
-        android:dialogTitle="@string/threshold"
-        android:entries="@array/Thresholds" android:entryValues="@array/Thresholds" android:key="threshold" android:title="@string/threshold" android:summary="@string/threshold_summary"/>
-    <EditTextPreference android:key="safeDistance" android:title="@string/maxSafeDistance" android:summary="@string/max_safe_distance_summary" android:defaultValue="1000"/>
+    <EditTextPreference
+        android:key="textMessage"
+        android:summary="@string/textMessageSummary"
+        android:title="@string/textMessageTitle" />
+    
+    <EditTextPreference
+        android:defaultValue="1000"
+        android:key="safeDistance"
+        android:summary="@string/max_safe_distance_summary"
+        android:title="@string/maxSafeDistance" />
 
 </PreferenceScreen>

@@ -1,6 +1,8 @@
 package pwr.project.getrawdata;
 
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Locale;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -44,18 +46,17 @@ public class GetRawData extends Activity implements OnClickListener,
 	private Location middleOfSafeZone;
 	private float maximumSafeDistance = 1000;
 	private boolean isMonitoring = false;
-	// private final float mAlpha = 0.8f;
-	private static float threshold;
+	private static float threshold = 3.5f;
 	private ToggleButton butStart;
 	ImageView view;
-	final static String thresholdPreference = "threshold";
+	final static String messageTextPreference = "textMessage";
 	final static String sendPreference = "sendMessage";
-	final static String telephonNumberPreference = "telephonNumber";
+	final static String telephonNumberPreference = "telephoneNumber";
 	final static String maxDistPreference = "safeDistance";
 	private static boolean isSendingMessage;
-	// final static String telephonNumber = "602780038";
 	private ArrayList<String> LogList;
-	final static String messageText = "RATUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUNKUUUUUUUUUUUU :OOOO";
+	private String messageText;
+	private Location currentLocation;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -99,12 +100,12 @@ public class GetRawData extends Activity implements OnClickListener,
 		super.onResume();
 		assert (mLocationManager != null);
 		isSendingMessage = prefs.getBoolean(sendPreference, false);
-		threshold = Float.parseFloat(prefs
-				.getString(thresholdPreference, "2.0"));
 		mLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER,
-				SensorManager.SENSOR_DELAY_UI, 0, this);
+				0, 0, this);
+
 		middleOfSafeZone = mLocationManager
 				.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+
 		if (middleOfSafeZone != null) {
 			Log.i(getClass().getSimpleName(),
 					"middleOfSafeZone = " + middleOfSafeZone.getLongitude()
@@ -112,6 +113,7 @@ public class GetRawData extends Activity implements OnClickListener,
 		}
 		String maxDist = prefs.getString(maxDistPreference, "1000");
 		maximumSafeDistance = Float.parseFloat(maxDist);
+		messageText = prefs.getString(messageTextPreference, "ratunku!");
 
 	}
 
@@ -123,6 +125,7 @@ public class GetRawData extends Activity implements OnClickListener,
 				middleOfSafeZone = mLocationManager
 						.getLastKnownLocation(LocationManager.GPS_PROVIDER);
 				startAccelerometerAndAdjustUI();
+				currentLocation = middleOfSafeZone;
 			} else {
 				isMonitoring = false;
 				stopAccelerometerAndAdjustUI();
@@ -155,12 +158,10 @@ public class GetRawData extends Activity implements OnClickListener,
 	void stopAccelerometerAndAdjustUI() {
 		view.setImageDrawable(getResources().getDrawable(R.drawable.klepsydra));
 		mSensorManager.unregisterListener(this);
-		// mLocationManager.removeUpdates(this);
 	}
 
 	@Override
 	public void onAccuracyChanged(Sensor sensor, int accuracy) {
-
 	}
 
 	@Override
@@ -189,7 +190,6 @@ public class GetRawData extends Activity implements OnClickListener,
 	}
 
 	private void maintainAlarm() {
-		// mLocationManager.removeUpdates(this);
 		sendMessage();
 		sr.wynikiPomiarow.clear();
 		isMonitoring = false;
@@ -198,14 +198,36 @@ public class GetRawData extends Activity implements OnClickListener,
 	}
 
 	private void sendMessage() {
+		Log.i(getClass().getSimpleName(), parseTextMessage(messageText));
+
 		if (isSendingMessage) {
 			String telephonNumber = prefs.getString(telephonNumberPreference,
-					"602780038");
+					"000000000");
+			parseTextMessage(messageText);
 			SmsManager sms = SmsManager.getDefault();
 			sms.sendTextMessage(telephonNumber, null, messageText, null, null);
 			Log.i(getClass().getSimpleName(), "Message sent to: "
 					+ telephonNumber);
 		}
+	}
+
+	private String parseTextMessage(String message) {
+		String resultMessage;
+		if(currentLocation != null){
+			resultMessage = message.replace("%l", "" + "dlugosc = "
+				+ currentLocation.getLongitude() + " szerokosc = "
+				+ currentLocation.getLatitude());
+		} else {
+			resultMessage = message.replace("%l","\"Brak informacji o lokalizacji!\"");
+		}
+		Calendar c = Calendar.getInstance();
+		String date = String.format(Locale.ENGLISH, "%d:%d:%d %d/%d/%d",
+				c.get(Calendar.HOUR_OF_DAY), c.get(Calendar.MINUTE),
+				c.get(Calendar.SECOND), c.get(Calendar.DAY_OF_MONTH),
+				c.get(Calendar.MONTH), c.get(Calendar.YEAR));
+		
+		resultMessage = resultMessage.replace("%d", date);
+		return resultMessage;
 	}
 
 	void adjustUserInterface(boolean isTriggerd) {
@@ -219,18 +241,16 @@ public class GetRawData extends Activity implements OnClickListener,
 		Log.i(getClass().getSimpleName(),
 				"location = " + location.getLongitude() + " "
 						+ location.getLatitude());
+		currentLocation = location;
 
-		isInSafeZone(location);
+		inSafeZone(location);
 	}
 
-	private boolean isInSafeZone(Location actual) {
-		if (actual.distanceTo(middleOfSafeZone) > maximumSafeDistance) {
-			if (isMonitoring)
-				raiseAlarm();
-			return false;
+	private void inSafeZone(Location actual) {
+		if (actual.distanceTo(middleOfSafeZone) > maximumSafeDistance
+				&& isMonitoring) {
+			raiseAlarm();
 		}
-
-		return true;
 	}
 
 	@Override

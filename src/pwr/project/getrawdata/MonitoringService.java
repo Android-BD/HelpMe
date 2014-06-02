@@ -32,10 +32,12 @@ public class MonitoringService extends Service implements SensorEventListener,
 	SharedPreferences prefs;
 	private Location middleOfSafeZone;
 	static final String ALARM = "ALARM";
+	private boolean isMonitoring;
 
 	@Override
 	public int onStartCommand(Intent intent, int flags, int startId) {
 		sredniaZPomiarow = new Srednia<WynikiACC>();
+		isMonitoring = true;
 		mLocationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
 		mLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER,
 				0, 0, this);
@@ -46,7 +48,8 @@ public class MonitoringService extends Service implements SensorEventListener,
 				.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
 		mSensorManager.registerListener(this, accelerometer,
 				SensorManager.SENSOR_DELAY_FASTEST);
-		middleOfSafeZone = mLocationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+		middleOfSafeZone = mLocationManager
+				.getLastKnownLocation(LocationManager.GPS_PROVIDER);
 		return super.onStartCommand(intent, flags, startId);
 
 	}
@@ -68,19 +71,23 @@ public class MonitoringService extends Service implements SensorEventListener,
 							rawZ));
 
 			GetRawData.log("Srednia = " + srednia);
-			if (srednia < GetRawData.threshold) {
+			if (srednia < GetRawData.threshold && isMonitoring) {
+				isMonitoring = false;
 				raiseAlarm();
 			}
 		}
 	}
 
 	private void raiseAlarm() {
-		if(GetRawData.isRunning)
+		if (GetRawData.isRunning)
 			sendBroadcast(new Intent(ALARM));
-		else{
+		else {
 			Intent i = new Intent(MonitoringService.this, GetRawData.class);
 			i.putExtra(ALARM, true);
+			i.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
+            i.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
 			i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+
 			startActivity(i);
 		}
 		maintainAlarm();
@@ -106,7 +113,6 @@ public class MonitoringService extends Service implements SensorEventListener,
 	private void sendMessage() {
 		String messageText = prefs.getString(GetRawData.messageTextPreference,
 				"");
-		Log.i(getClass().getSimpleName(), parseTextMessage(messageText));
 
 		if (GetRawData.isSendingMessage) {
 			String telephonNumber = prefs.getString(

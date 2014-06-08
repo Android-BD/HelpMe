@@ -37,11 +37,16 @@
         <item>3.75</item>
         <item>4</item>
     </string-array>
-        <string name="threshold_summary">"Wybierz wartosc graniczna "</string>
-        <string name="show_log">Pokaz Log</string>
-        <string name="clear_log">Clear Log</string>
-        <string name="maxSafeDistance">Maksymalny promien spaceru</string>
-        <string name="max_safe_distance_summary">Maksymalna dozwolona odleglosc od domu</string>
-        <string name="textMessageTitle">Wiadomość tekstowa</string>
-        <string name="textMessageSummary">Tekst wiadomosci do wyslania</string>
-</resources>
+
+    <string name="threshold_summary">"Wybierz wartosc graniczna "</string>
+    <string name="show_log">Pokaz Log</string>
+    <string name="clear_log">Clear Log</string>
+    <string name="maxSafeDistance">Maksymalny promien spaceru</string>
+    <string name="max_safe_distance_summary">Maksymalna dozwolona odleglosc od domu</string>
+    <string name="textMessageTitle">Wiadomość tekstowa</string>
+    <string name="textMessageSummary">Tekst wiadomosci do wyslania</string>
+    <string name="title_activity_about">About</string>
+    <string name="hello_world">Hello world!</string>
+    <string name="action_settings">Settings</string>
+
+</resources>

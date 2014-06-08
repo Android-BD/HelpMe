@@ -4,6 +4,8 @@ import java.util.Calendar;
 import java.util.Locale;
 
 import android.annotation.SuppressLint;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
@@ -18,9 +20,12 @@ import android.location.LocationManager;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.preference.PreferenceManager;
-import android.util.Log;
+import android.support.v4.app.NotificationCompat;
+import android.telephony.SmsManager;
 import android.widget.Toast;
 
+
+@SuppressLint("InlinedApi")
 public class MonitoringService extends Service implements SensorEventListener,
 		LocationListener {
 
@@ -70,7 +75,6 @@ public class MonitoringService extends Service implements SensorEventListener,
 					.sredniaCalkowitaZWieluPomiarow(new WynikiACC(rawX, rawY,
 							rawZ));
 
-			GetRawData.log("Srednia = " + srednia);
 			if (srednia < GetRawData.threshold && isMonitoring) {
 				isMonitoring = false;
 				raiseAlarm();
@@ -79,16 +83,10 @@ public class MonitoringService extends Service implements SensorEventListener,
 	}
 
 	private void raiseAlarm() {
-		if (GetRawData.isRunning)
+		if (GetRawData.isRunning) {
 			sendBroadcast(new Intent(ALARM));
-		else {
-			Intent i = new Intent(MonitoringService.this, GetRawData.class);
-			i.putExtra(ALARM, true);
-			i.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
-            i.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
-			i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-
-			startActivity(i);
+		} else {
+			createNotification();
 		}
 		maintainAlarm();
 		stopSelf();
@@ -102,28 +100,48 @@ public class MonitoringService extends Service implements SensorEventListener,
 
 	}
 
+	private void createNotification() {
+
+		Intent resultIntent = new Intent(this, GetRawData.class);
+		resultIntent.putExtra(ALARM, true);
+		resultIntent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
+
+		PendingIntent resultPendingIntent = PendingIntent.getActivity(this, 0,
+				resultIntent, PendingIntent.FLAG_ONE_SHOT
+						| PendingIntent.FLAG_UPDATE_CURRENT);
+
+		NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(
+				this).setSmallIcon(R.drawable.error)
+				.setContentTitle(getResources().getString(R.string.app_name))
+				.setContentIntent(resultPendingIntent)
+				.setContentText("Alarm zostal wykryty!!").setAutoCancel(true);
+
+		int mNotificationId = 001;
+		NotificationManager mNotifyMgr = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+		mNotifyMgr.notify(mNotificationId, mBuilder.build());
+	}
+
 	@Override
 	public void onDestroy() {
 		mSensorManager.unregisterListener(this);
 		mLocationManager.removeUpdates(this);
 		super.onDestroy();
-
 	}
 
 	private void sendMessage() {
-		String messageText = prefs.getString(GetRawData.messageTextPreference,
-				"");
+		String messageText = prefs.getString(
+				GetRawData.messageTextPreference,"");
 
 		if (GetRawData.isSendingMessage) {
+			
 			String telephonNumber = prefs.getString(
 					GetRawData.telephonNumberPreference, "000000000");
+			
 			messageText = parseTextMessage(messageText);
-			// SmsManager sms = SmsManager.getDefault();
-			// sms.sendTextMessage(telephonNumber, null, messageText, null,
-			// null);
-			Log.i(getClass().getSimpleName(), "Message sent to: "
-					+ telephonNumber);
-			Log.i(getClass().getSimpleName(), "Message sent: " + messageText);
+			
+			SmsManager sms = SmsManager.getDefault();
+			sms.sendTextMessage(telephonNumber, null, messageText, null, null);
+			
 			Toast.makeText(this, "ALARM, message sento to = " + telephonNumber,
 					Toast.LENGTH_SHORT).show();
 		}
@@ -136,10 +154,12 @@ public class MonitoringService extends Service implements SensorEventListener,
 			resultMessage = message.replace("%l", "" + "dlugosc = "
 					+ currentLocation.getLongitude() + " szerokosc = "
 					+ currentLocation.getLatitude());
+			
 		} else {
 			resultMessage = message.replace("%l",
 					"\"Brak informacji o lokalizacji!\"");
 		}
+		
 		Calendar c = Calendar.getInstance();
 		String date = String.format(Locale.getDefault(), "%d:%d:%d %d/%d/%d",
 				c.get(Calendar.HOUR_OF_DAY), c.get(Calendar.MINUTE),
@@ -151,14 +171,11 @@ public class MonitoringService extends Service implements SensorEventListener,
 	}
 
 	@Override
-	public void onAccuracyChanged(Sensor sensor, int accuracy) {
-
-	}
+	public void onAccuracyChanged(Sensor sensor, int accuracy) {}
 
 	@Override
 	public void onLocationChanged(Location location) {
 		currentLocation = location;
-
 		inSafeZone(location);
 	}
 
@@ -169,21 +186,12 @@ public class MonitoringService extends Service implements SensorEventListener,
 	}
 
 	@Override
-	public void onStatusChanged(String provider, int status, Bundle extras) {
-		// TODO Auto-generated method stub
-
-	}
+	public void onStatusChanged(String provider, int status, Bundle extras) {}
 
 	@Override
-	public void onProviderEnabled(String provider) {
-		// TODO Auto-generated method stub
-
-	}
+	public void onProviderEnabled(String provider) {}
 
 	@Override
-	public void onProviderDisabled(String provider) {
-		// TODO Auto-generated method stub
-
-	}
+	public void onProviderDisabled(String provider) {}
 
 }

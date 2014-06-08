@@ -20,6 +20,7 @@
         <activity
             android:name="pwr.project.getrawdata.GetRawData"
             android:label="@string/app_name"
+            android:launchMode="singleTop"
             android:screenOrientation="portrait" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -31,8 +32,18 @@
         </activity>
 
         <service
-            android:name="pwr.project.getrawdata.MonitoringService">            
+            android:name="pwr.project.getrawdata.MonitoringService"
+            android:enabled="true" >
         </service>
+
+        <activity
+            android:name="pwr.project.getrawdata.AboutActivity"
+            android:label="@string/title_activity_about"
+            android:parentActivityName="pwr.project.getrawdata.GetRawData" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="pwr.project.getrawdata.GetRawData" />
+        </activity>
     </application>
 
 </manifest>
